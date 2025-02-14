@@ -99,7 +99,7 @@ int main() {
     wc.lpszClassName = L"InjectorWindowClass"; 
     RegisterClass(&wc);
 
-    HWND hwnd = CreateWindow(L"InjectorWindowClass", L"tj88888 injectorrrrr", WS_OVERLAPPEDWINDOW,
+    HWND hwnd = CreateWindow(L"InjectorWindowClass", L"tj88888 injectorrrr", WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, 300, 150,
         NULL, NULL, wc.hInstance, NULL);
     if (!hwnd) {
