@@ -4,9 +4,9 @@
 #include <string>
 #include <shlwapi.h>
 
-#pragma comment(lib, "shlwapi.lib") // For PathAppend
+#pragma comment(lib, "shlwapi.lib") 
 
-// Function to convert WCHAR* to char* for comparison (process names)
+
 std::string WcharToChar(const WCHAR* wcharStr) {
     int len = WideCharToMultiByte(CP_ACP, 0, wcharStr, -1, nullptr, 0, nullptr, nullptr);
     std::string charStr(len, 0);
@@ -14,7 +14,6 @@ std::string WcharToChar(const WCHAR* wcharStr) {
     return charStr;
 }
 
-// Function to find the process ID of Minecraft
 DWORD GetProcessID(const char* processName) {
     DWORD processID = 0;
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -25,7 +24,7 @@ DWORD GetProcessID(const char* processName) {
 
     if (Process32First(snapshot, &processEntry)) {
         do {
-            std::string processExe = WcharToChar(processEntry.szExeFile); // Convert WCHAR* to char* for comparison
+            std::string processExe = WcharToChar(processEntry.szExeFile); 
             if (_stricmp(processExe.c_str(), processName) == 0) {
                 processID = processEntry.th32ProcessID;
                 break;
@@ -36,7 +35,7 @@ DWORD GetProcessID(const char* processName) {
     return processID;
 }
 
-// Function to inject the DLL into the process
+
 bool InjectDLL(DWORD processID, const char* dllPath) {
     HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processID);
     if (!process) return false;
@@ -54,25 +53,24 @@ bool InjectDLL(DWORD processID, const char* dllPath) {
     return true;
 }
 
-// Function to get the full path of the EXE (and the DLL in the same folder)
 std::string GetCurrentFolder() {
     char buffer[MAX_PATH];
     GetModuleFileNameA(NULL, buffer, MAX_PATH);
-    PathRemoveFileSpecA(buffer); // Removes the filename from the path
+    PathRemoveFileSpecA(buffer); 
     return std::string(buffer);
 }
 
-// Window procedure for the GUI
+
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_CLOSE:
         PostQuitMessage(0);
         return 0;
     case WM_COMMAND:
-        if (LOWORD(wParam) == 1) {  // If the Inject button is clicked
-            const char* processName = "javaw.exe"; // Minecraft process
+        if (LOWORD(wParam) == 1) {  
+            const char* processName = "javaw.exe"; 
             std::string exePath = GetCurrentFolder();
-            std::string dllPath = exePath + "\\Hack.dll"; // DLL path in the same folder
+            std::string dllPath = exePath + "\\Hack.dll"; 
 
             DWORD processID = GetProcessID(processName);
             if (!processID) {
@@ -94,15 +92,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 }
 
 int main() {
-    // Register the window class
     const char* className = "InjectorWindowClass";
     WNDCLASS wc = { 0 };
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = GetModuleHandle(NULL);
-    wc.lpszClassName = L"InjectorWindowClass";  // Use wide string here
+    wc.lpszClassName = L"InjectorWindowClass"; 
     RegisterClass(&wc);
 
-    // Create the window
     HWND hwnd = CreateWindow(L"InjectorWindowClass", L"NiggaShitter", WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, 300, 150,
         NULL, NULL, wc.hInstance, NULL);
@@ -110,15 +106,12 @@ int main() {
         return 0;
     }
 
-    // Create the "Inject" button
     CreateWindow(L"BUTTON", L"Inject", WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
         100, 50, 100, 30, hwnd, (HMENU)1, wc.hInstance, NULL);
 
-    // Show the window
     ShowWindow(hwnd, SW_SHOWNORMAL);
     UpdateWindow(hwnd);
 
-    // Message loop
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
